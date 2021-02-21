@@ -43,3 +43,5 @@ DB_DATABASE=nome-do-banco
 DB_USERNAME=postgres
 DB_PASSWORD=12345
 ```
+
+- Execute a migration com `docker-compose exec app php artisan migrate`
