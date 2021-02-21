@@ -27,3 +27,19 @@ docker-compose exec app composer install
 ```
 
 Abra a aplicação no browser com `localhost:8010`
+
+
+### Configuração
+
+- Faça a cópia do `.env.example` para `.env`
+- Gere a chave da aplicação `docker-compose exec app php artisan key:g`
+- Crie um banco dados no postgres. Pode usar o pgadmin em `localhost:8011`. Para acessar use `user@mail.com`, senha `12345`.
+- Configure as variaveis do banco de dados no `.env`
+```
+DB_CONNECTION=pgsql
+DB_HOST=db
+DB_PORT=5432
+DB_DATABASE=nome-do-banco
+DB_USERNAME=postgres
+DB_PASSWORD=12345
+```
