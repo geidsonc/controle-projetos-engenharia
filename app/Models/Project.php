@@ -40,7 +40,7 @@ class Project extends Model
 
     public function projectStatus()
     {
-        $this->hasMany(ProjectStatus::class);
+        return $this->hasMany(ProjectStatus::class);
     }
 
     public function users()

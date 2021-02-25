@@ -16,10 +16,12 @@ class CreateProjectstatus extends Migration
         Schema::create('project_status', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('project_id');
+            $table->unsignedBigInteger('user_id');
             $table->text('technical_opinion');
             $table->enum('status', ['1','2','3','4','5','6']);
 
             $table->foreign('project_id')->references('id')->on('projects');
+            $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();
         });
     }
