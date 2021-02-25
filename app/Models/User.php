@@ -9,6 +9,10 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
+    const TYPE_GERENTE = 'A';
+    const TYPE_TECNICO_MEDIO = 'TM';
+    const TYPE_TECNICO_SUPERIOR = 'TS';
+
     use HasFactory, Notifiable;
 
     /**
