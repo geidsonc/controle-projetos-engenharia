@@ -1,24 +1,28 @@
 <template>
-	<b-card
-    title="Login"
-    style="max-width: 20rem;"
-    class="mb-2"
-  >
-	<div class="mt-2">CPF:</div>
-	<b-form-input v-model="cpf" placeholder="Informe seu CPF"></b-form-input>
-
-	<div class="mt-2">Senha:</div>
-	<b-form-input type="password" v-model="password" placeholder="Informe sua senha"></b-form-input>
-
-    <b-button
-		class="mt-4"
-		block
-		variant="primary"
-		@click="login"
+	<div
+		class="d-flex justify-content-center align-items-center card-container"
 	>
-		Login
-	</b-button>
-  </b-card>
+		<b-card
+			title="Login"
+			class="mb-2 card-style"
+		>
+			<div class="mt-4">CPF:</div>
+			<b-form-input class="mt-1" v-model="cpf" placeholder="Informe seu CPF"></b-form-input>
+
+			<div class="mt-3">Senha:</div>
+			<b-form-input class="mt-1" type="password" v-model="password" placeholder="Informe sua senha"></b-form-input>
+			<small v-if="!isAuthenticated && cpf.length > 0 && password.length > 0" class="text-danger">Usuário ou senha inválidos</small>
+
+			<b-button
+				class="mt-4"
+				block
+				variant="primary"
+				@click="login"
+			>
+				Entrar
+			</b-button>
+		</b-card>
+	</div>
 </template>
 
 <script>
@@ -27,19 +31,33 @@
 	  return {
 		cpf: '',
 		password: '',
+		isAuthenticated: true,
 	  }
 	},
 
 	methods: {
 		login() {
-			let t = this.axios.get('/auth/login', {params: {email: this.cpf, password: this.password}}).then(({data}) => {
-				
-				if (data === 1) {
-					this.$router.push({name:'projects'});
-				}
-			});
+			this.axios
+				.get('/auth/login', {params: {email: this.cpf, password: this.password}})
+				.then(({data}) => {
+					if (!!data) {
+						this.$router.push({name:'projects'});
+						this.isAuthenticated = true;
+					}
+				}).catch((error) => {
+					this.isAuthenticated = false;
+				});
 		}
 
 	},
   }
 </script>
+<style>
+	.card-container {
+		height: 100vh;
+	}
+
+	.card-style {
+		max-width: 20rem;
+	}
+</style>

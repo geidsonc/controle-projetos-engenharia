@@ -1,8 +1,7 @@
 require('./bootstrap');
 
-import Vue from 'vue'
-
-import BootstrapVue from 'bootstrap-vue';
+import Vue from 'vue';
+import { BootstrapVue, BootstrapVueIcons } from 'bootstrap-vue';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
@@ -13,8 +12,9 @@ import VueRouter from 'vue-router'
 import routes from './routes';
 
 Vue.use(BootstrapVue);
+Vue.use(BootstrapVueIcons);
 Vue.use(VueAxios, axios);
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
 const router = new VueRouter({
 	mode: 'history',
@@ -23,7 +23,6 @@ const router = new VueRouter({
 
 //Main pages
 import App from './views/app.vue'
-
 
 const app = new Vue({
     router,
