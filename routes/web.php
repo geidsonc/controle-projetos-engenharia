@@ -23,3 +23,6 @@ Route::resource('project', ProjectController::class);
 
 Route::get('auth/login', 'App\Http\Controllers\AuthController@login');
 Route::get('auth/logout', 'App\Http\Controllers\AuthController@logout');
+
+    
+// Route::get('/{any?}', App\Http\Controllers\PagesController::class);
