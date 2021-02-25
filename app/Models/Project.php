@@ -20,8 +20,6 @@ class Project extends Model
     protected $casts = [
         'process_number' => 'string',
         'agreement_number' => 'string',
-        'start_date' => 'date',
-        'end_date' => 'date',
         'city' => 'string',
         'resume' => 'string',
     ];

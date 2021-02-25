@@ -45,6 +45,17 @@ class User extends Authenticatable
     protected $casts = [
     ];
 
+    public function translateType()
+    {
+        $types = [
+            self::TYPE_GERENTE => 'Chefe de departamento',
+            self::TYPE_TECNICO_MEDIO => 'Técnico de nível médio',
+            self::TYPE_TECNICO_SUPERIOR => 'Técnico de nível superior',
+        ];
+
+        return $types[$this->type];
+    }
+
     public function projects()
     {
         return $this->belongsToMany(Project::class);

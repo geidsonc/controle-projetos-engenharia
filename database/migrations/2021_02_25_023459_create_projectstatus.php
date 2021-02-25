@@ -20,6 +20,7 @@ class CreateProjectstatus extends Migration
             $table->enum('status', ['1','2','3','4','5','6']);
 
             $table->foreign('project_id')->references('id')->on('projects');
+            $table->timestamps();
         });
     }
 
