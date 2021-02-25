@@ -19,3 +19,6 @@ Route::get('/', function () {
 });
 
 Route::resource('users', UserController::class);
+
+Route::get('auth/login', 'App\Http\Controllers\AuthController@login');
+Route::get('auth/logout', 'App\Http\Controllers\AuthController@logout');
