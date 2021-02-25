@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\ProjectResource;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -19,7 +20,7 @@ class ProjectController extends Controller
             return auth()->user->projects;
         }
 
-        return Project::all();
+        return ProjectResource::collection(Project::all());
     }
 
     /**
@@ -31,7 +32,7 @@ class ProjectController extends Controller
     public function store(Request $request)
     {
         if (auth()->user->type != User::TYPE_GERENTE) {
-            return abort(403, ['message' => 'Unauthorized.']);
+            return abort(401, 'Não autorizado');
         }
 
         $request->validate([
@@ -61,14 +62,12 @@ class ProjectController extends Controller
     public function show(Project $project)
     {
         $project->action_value = $project->translateAction();
-        $project->loadMissing('users');
+        $project->loadMissing([
+            'users',
+            'projectStatus.user'
+        ]);
 
-        $project->users->map(function($user) {
-            $user->type_value = $user->translateType();
-            return $user;
-        });
-
-        return $project;
+        return new ProjectResource($project);
     }
 
     /**
@@ -81,7 +80,7 @@ class ProjectController extends Controller
     public function update(Request $request, Project $project)
     {
         if (auth()->user->type != User::TYPE_GERENTE) {
-            return abort(403, ['message' => 'Unauthorized.']);
+            return abort(401, 'Não autorizado');
         }
 
         $request->validate([
@@ -111,7 +110,7 @@ class ProjectController extends Controller
     public function destroy(Project $project)
     {
         if (auth()->user->type != User::TYPE_GERENTE) {
-            return abort(403, ['message' => 'Unauthorized.']);
+            return abort(401, 'Não autorizado');
         }
 
         return $project->delete();

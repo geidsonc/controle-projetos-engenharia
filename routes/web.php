@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\ProjectStatusController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,8 +19,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::resource('project', ProjectController::class);
-// Route::resource('project/status', ProjectStatusController::class);
+Route::apiResource('project', ProjectController::class)
+    ->middleware('auth');
+
+Route::apiResource('project.status', ProjectStatusController::class)->only([
+    'store'
+])
+    ->middleware('auth');
 
 Route::get('auth/login', 'App\Http\Controllers\AuthController@login');
 Route::get('auth/logout', 'App\Http\Controllers\AuthController@logout');

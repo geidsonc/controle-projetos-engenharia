@@ -11,7 +11,7 @@ class ProjectStatus extends Model
     protected $fillable = [
         'project_id',
         'user_id',
-        'technical_option',
+        'technical_opinion',
         'status',
     ];
 
@@ -35,6 +35,11 @@ class ProjectStatus extends Model
 
     public function project()
     {
-        $this->belongsTo(Project::class);
+        return $this->belongsTo(Project::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }
