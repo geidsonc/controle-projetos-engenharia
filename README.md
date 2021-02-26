@@ -85,3 +85,12 @@ docker-compose exec app php artisan migrate:fresh --seed
 ```
 
 Abra a aplicação no browser com `localhost:8010`
+
+Para testar utilize os usuários
+```
+Gerente: joao@email.com
+Técnico: geraldo@email.com
+Técnico: chico@email.com
+
+Password: 20212021
+```
