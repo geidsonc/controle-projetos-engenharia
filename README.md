@@ -1,4 +1,8 @@
-# projeto-de-software
+# Projeto de sistema para controle de projetos em um departamentode engenharia
+Este projeto foi construído no curso de pós-gradução em Engenharia de Software como resultado das disciplinas de Engenharia de Requisitos e Análise de Projeto de Software.
+
+O sistema analisado e construído visa auxiliar o um chefe de departamento de engenharia na gestão, supervisão e distribuição de projetos de convênios. Irá armazenar os pareceres emitidos pelos técnicos responsáveis durante a execução das atividades de análise e acompanhamento dos projetos de engenharia. 
+
 
 ### Requisitos
 
