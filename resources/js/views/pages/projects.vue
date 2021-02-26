@@ -1,9 +1,17 @@
 <template>
 	<b-container
-		class="mt-5"
+        fluid
+		class="py-3 px-5"
 	>
-		<h2>Lista de projetos</h2>
-		<h6>Emita pareceres e gerencie projetos acompanhados por você</h6>
+        <b-row>
+            <b-col cols="11">
+                <h2>Lista de projetos</h2>
+                <h6>Emita pareceres e gerencie projetos acompanhados por você</h6>
+            </b-col>
+            <b-col class="text-right">
+                <a href="/auth/logout">Sair</a>
+            </b-col>
+        </b-row>
 
 		<div class="d-flex justify-content-between mt-5 align-items-center">
 			<b-form-group
@@ -39,6 +47,9 @@
       :filter-included-fields="filterOn"
 			@filtered="onFiltered"
 		>
+            <template #cell(name)="row">
+				{{row.item.name}}
+			</template>
 
             <template #cell(user_name)="row">
                 <div
@@ -58,7 +69,7 @@
 			</template>
 
 			 <template #cell(button)="row">
-				<b-button size="sm" class="mr-1" variant="outline-primary" @click="showModal">
+				<b-button size="sm" class="mr-1" variant="outline-primary" @click="showModalParecer(row.item.id)">
 					Emitir parecer
 				</b-button>
 			</template>
@@ -70,20 +81,26 @@
 					</template>
 
 					<b-dropdown-item>Editar</b-dropdown-item>
-					<b-dropdown-item @click="showDeleteDialog">Excluir</b-dropdown-item>
+					<b-dropdown-item @click="showDeleteDialog(row.item)">Excluir</b-dropdown-item>
 				</b-dropdown>
 			</template>
 
 		</b-table>
 
-		<b-modal ref="my-modal" title="Emitir parecer" okTitle="Emitir parecer" cancel-title="Fechar">
+		<b-modal
+            ref="modal-parecer"
+            title="Emitir parecer"
+            okTitle="Emitir parecer"
+            cancel-title="Fechar"
+            @ok="criarParecer"
+        >
 			<div class="mt-3">Situação:</div>
-			<b-form-input class="mt-1" v-model="cpf" placeholder="Informe a situação do projeto"></b-form-input>
+            <b-form-select v-model="parecer.status" :options="optionsStatusParecer"></b-form-select>
 
 			<div class="mt-3">Observação:</div>
 			<b-form-textarea
 				id="textarea"
-				v-model="text"
+				v-model="parecer.technical_opinion "
 				placeholder="Informe alguma observação, caso necessário"
 				rows="3"
 				max-rows="6"
@@ -114,7 +131,7 @@
 		data() {
 			return {
 				filter: null,
-        filterOn: [],
+        		filterOn: [],
 				fields: [
 					{
 						key: 'process_number',
@@ -126,6 +143,11 @@
 						label: 'Nº de convênio',
 						sortable: true
 					},
+                    {
+                        key: 'name',
+						label: 'Título',
+						sortable: true
+                    },
 					{
 						key: 'user_name',
 						label: 'Técnico',
@@ -149,21 +171,38 @@
 					{ key: 'more_actions', label: '' }
 				],
 				items: [
-				]
+				],
+                optionsStatusParecer: [
+                    { value: '1', text: 'Em análise' },
+                    { value: '2', text: 'Em diligência' },
+                    { value: '3', text: 'Em execução' },
+                    { value: '4', text: 'Concluído com pendência' },
+                    { value: '5', text: 'Concluído sem pendência' },
+                    { value: '6', text: 'Cancelado' },
+                ],
+				parecer: {
+					project_id: null,
+					status: 1,
+					technical_opinion: '',
+				}
 			}
 		},
 
 		mounted() {
-			this.axios
+			this.listProjects();
+		},
+
+		methods: {
+            listProjects() {
+                this.axios
 				.get('/project')
 				.then(({data}) => {
                     this.items = data;
 				});
-		},
-
-		methods: {
-      showModal() {
-        this.$refs['my-modal'].show();
+            },
+            showModalParecer(id) {
+                this.parecer.project_id = id;
+                this.$refs['modal-parecer'].show();
 			},
 
 			showRegisterModal() {
@@ -176,8 +215,8 @@
         this.currentPage = 1
 			},
 
-			showDeleteDialog() {
-				this.$bvModal.msgBoxOk('Realmente deseja excluir o convênio 9999/AAAA? A ação não poderá ser desfeita.', {
+			showDeleteDialog(project) {
+				this.$bvModal.msgBoxOk(`Realmente deseja excluir o convênio ${project.agreement_number}? A ação não poderá ser desfeita.`, {
 					title: 'Confirmação de exclusão',
 					size: 'md',
 					buttonSize: 'md',
@@ -191,12 +230,46 @@
           hideHeaderClose: false,
 				})
 					.then(value => {
-						//
+						 this.axios.delete(`/project/${project.id}`)
+                            .then(({data}) => {
+                                this.$bvToast.toast(`Convênio ${project.agreement_number} deletado`, {
+                                    title: 'Deletado',
+                                    autoHideDelay: 5000,
+                                    appendToast: append
+                                })
+                                this.listProjects();
+                            });
 					})
 					.catch(err => {
-						// An error occurred
-					})
-			},
+						this.$bvModal.msgBoxOk(`Sem permissão para deletar`, {
+                            title: 'Aviso',
+                            size: 'md',
+                            buttonSize: 'md',
+                            okVariant: 'primary',
+                            cancelVariant: 'danger',
+                            headerClass: 'p-4 border-bottom-0',
+                            centered: true,
+                            okTitle: 'Sim',
+                            cancelTitle: 'Não',
+                            footerClass: 'p-2',
+                            hideHeaderClose: false,
+                        });
+			        });
+            },
+
+            criarParecer() {
+                console.log(this.parecer);
+
+                this.axios
+                    .post(`/project/${this.parecer.project_id}/status`, {
+                        'status': this.parecer.status,
+                        'technical_opinion': this.parecer.technical_opinion,
+                    })
+                    .then(({data}) => {
+                        this.$refs['modal-parecer'].hide();
+                        this.listProjects();
+                    });
+            }
     }
 	}
 </script>

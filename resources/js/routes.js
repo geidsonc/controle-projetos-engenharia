@@ -3,11 +3,7 @@ import Projects from './views/pages/projects.vue';
 export default [
     {
 		path: '/',
-		redirect: '/projects',
-	},
-    {
-        path: '/projects',
+        component: Projects,
         name: 'projects',
-		component: Projects,
 	},
 ];

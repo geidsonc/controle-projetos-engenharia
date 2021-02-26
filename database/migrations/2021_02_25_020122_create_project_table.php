@@ -15,15 +15,16 @@ class CreateProjectTable extends Migration
     {
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 50);
+            $table->string('name');
             $table->string('process_number', 20)->unique();
             $table->string('agreement_number', 20)->unique();
             $table->enum('action', ['MSD','MH','SAA','SES','RES','DRE']);
             $table->date('start_date');
             $table->date('end_date');
-            $table->string('city', 20);
+            $table->string('city', 50);
             $table->text('resume');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
