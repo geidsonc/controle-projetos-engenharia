@@ -1,35 +1,66 @@
 # projeto-de-software
 
-Há 4 serviços configurados:
+### Requisitos
 
-- app
-- db na porta 5433:5432
-- pgadmin na porta 8011
-- ngix porta 8010
+Tenha instalado em seu ambiente o Docker e o docker-compose
+Guia de instalação:
+- Docker: [Guia de instalação do docker](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04-pt)
+- docker-compose: [Guia de instalação do docker-compose](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-compose-on-ubuntu-20-04-pt)
 
-A aplicação sobe na porta 8010
+
+### Geral
+
+O sistema utiliza o framework Laravel, servidor ngix e base de dados postgres.
+
+Há 4 serviços pré-configurados para o docker:
+
+- app - Imagem Ubuntu com `php`, `npm` e outras bibliotecas para executar a aplicação
+- db - Imagem Ubuntu com `postgres` configurado
+- pgadmin - Imagem com cliente pgadmin disponível na porta `8011`
+- ngix - Imagem com o serviço HTTP Server `ngix` configurado disponível na porta `8010`
+
 
 ### Instalação
 
-Compile a imagem app
+#### Passo 1
+
+Faça um clone desse projeto.
+`git clone git@github.com:geidsonc/projeto-de-software.git`
+
+#### Passo 2
+
+Compile a imagem docker app.
+Na raiz do projeto execute.
 ```bash
 docker-compose build app
 ```
 
-Suba os containers
+#### Passo 3
+
+Suba os containers com o comando
 ```bash
 docker-compose up -d
 ```
 
+#### Passo 4
 Instale as dependências
 ```bash
 docker-compose exec app composer install
 ```
 
-Abra a aplicação no browser com `localhost:8010`
+```bash
+docker-compose exec app npm i
+```
 
+#### Passo 5
+Compile o front-end
+```bash
+docker-compose exec app npm i
+```
 
-### Configuração
+#### Passo 6
+
+Faça a configuração do projeto
 
 - Faça a cópia do `.env.example` para `.env`
 - Gere a chave da aplicação `docker-compose exec app php artisan key:g`
@@ -44,4 +75,9 @@ DB_USERNAME=postgres
 DB_PASSWORD=12345
 ```
 
-- Execute a migration com `docker-compose exec app php artisan migrate`
+- Execute a migração para criar as tabelas e popular a base de dados
+```
+docker-compose exec app php artisan migrate:fresh --seed
+```
+
+Abra a aplicação no browser com `localhost:8010`
