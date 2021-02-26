@@ -1,14 +1,14 @@
 <template>
 	<b-container
-        fluid
+				fluid
 		class="py-3 px-5"
 	>
-        <b-row>
-            <b-col cols="11">
-                <h2>Lista de projetos</h2>
-                <h6>Emita pareceres e gerencie projetos acompanhados por você</h6>
-            </b-col>
-        </b-row>
+				<b-row>
+						<b-col cols="11">
+								<h2>Lista de projetos</h2>
+								<h6>Emita pareceres e gerencie projetos acompanhados por você</h6>
+						</b-col>
+				</b-row>
 
 		<div class="d-flex justify-content-between mt-5 align-items-center">
 			<b-form-group
@@ -41,24 +41,24 @@
 			:items="items"
 			:fields="fields"
 			:filter="filter"
-      :filter-included-fields="filterOn"
+			:filter-included-fields="filterOn"
 			@filtered="onFiltered"
-            style="font-size: 15px !important"
+						style="font-size: 15px !important"
 		>
-            <template #cell(name)="row">
+						<template #cell(name)="row">
 				{{row.item.name}}
 			</template>
 
-            <template #cell(user_name)="row">
-                <div
-                    v-for="user in row.item.users"
-                    :key="user.id"
-                >
-				    {{user.name}}
-                </div>
+						<template #cell(user_name)="row">
+								<div
+										v-for="user in row.item.users"
+										:key="user.id"
+								>
+						{{user.name}}
+								</div>
 			</template>
 
-            <template #cell(action)="row">
+						<template #cell(action)="row">
 				{{row.item.action}} - {{ row.item.action_value }}
 			</template>
 
@@ -86,14 +86,14 @@
 		</b-table>
 
 		<b-modal
-            ref="modal-parecer"
-            title="Emitir parecer"
-            okTitle="Emitir parecer"
-            cancel-title="Fechar"
-            @ok="criarParecer"
-        >
+			ref="modal-parecer"
+			title="Emitir parecer"
+			okTitle="Emitir parecer"
+			cancel-title="Fechar"
+			@ok="criarParecer"
+		>
 			<div class="mt-3">Situação:</div>
-            <b-form-select v-model="parecer.status" :options="optionsStatusParecer"></b-form-select>
+			<b-form-select v-model="parecer.status" :options="optionsStatusParecer"></b-form-select>
 
 			<div class="mt-3">Observação:</div>
 			<b-form-textarea
@@ -106,19 +106,44 @@
 			></b-form-textarea>
 		</b-modal>
 
-		<b-modal ref="register-modal" title="Cadastrar projeto" okTitle="Cadastrar" cancel-title="Fechar">
-			<div class="mt-3">Nº de convênio:</div>
-			<b-form-input class="mt-1" v-model="cpf" placeholder="Informe a situação do projeto"></b-form-input>
-
-			<div class="mt-3">Nº Conv. P+ BR:</div>
-			<b-form-input class="mt-1" v-model="cpf" placeholder="Informe a situação do projeto"></b-form-input>
+		<b-modal
+			scrollable
+			ref="register-modal"
+			title="Cadastrar projeto"
+			okTitle="Cadastrar"
+			cancel-title="Fechar"
+			@ok="createProject"
+		>
+			<div class="mt-3">Title:</div>
+			<b-form-input class="mt-1" v-model="project_data.name" placeholder="Informe o título do projeto"></b-form-input>
 
 			<div class="mt-3">Nº do processo de Projeto:</div>
-			<b-form-input class="mt-1" v-model="cpf" placeholder="Informe a situação do projeto"></b-form-input>
+			<b-form-input class="mt-1" v-model="project_data.process_number" placeholder="Informe o número do processo do projeto"></b-form-input>
+			
+			<div class="mt-3">Nº de convênio:</div>
+			<b-form-input class="mt-1" v-model="project_data.agreement_number" placeholder="Informe o número de convênio do projeto"></b-form-input>
 
-			<div class="mt-3">Nº do processo de Convênio</div>
-			<b-form-input class="mt-1" v-model="cpf" placeholder="Informe a situação do projeto"></b-form-input>
+			<div class="mt-3">Ação:</div>
+			<b-form-select v-model="project_data.action" :options="actionsOptions"></b-form-select>
+			
+			<div class="mt-3">Situação:</div>
+			<b-form-select v-model="project_data.status" :options="optionsStatusParecer"></b-form-select>
 
+			<div class="mt-3">Técnico responsável:</div>
+			<b-form-select v-model="project_data.user" :options="users"></b-form-select>
+
+			<div class="mt-3">Município:</div>
+			<b-form-select v-model="project_data.city" :options="cityOptions"></b-form-select>
+
+			<div class="mt-3">Observação:</div>
+			<b-form-textarea
+				id="textarea"
+				v-model="project_data.resume"
+				placeholder="Adicione alguma observação"
+				rows="3"
+				max-rows="6"
+				class="mb-4"
+			/>
 		</b-modal>
 
 	</b-container>
@@ -128,24 +153,25 @@
 	export default {
 		data() {
 			return {
+				users: [],
 				filter: null,
-        		filterOn: [],
+				filterOn: [],
 				fields: [
 					{
 						key: 'process_number',
 						label: 'Nº do processo',
 						sortable: true
 					},
-                    {
+					{
 						key: 'agreement_number',
 						label: 'Nº de convênio',
 						sortable: true
 					},
-                    {
-                        key: 'name',
+					{
+						key: 'name',
 						label: 'Título',
 						sortable: true
-                    },
+					},
 					{
 						key: 'user_name',
 						label: 'Técnico',
@@ -180,14 +206,38 @@
 				],
 				items: [
 				],
-                optionsStatusParecer: [
-                    { value: '1', text: 'Em análise' },
-                    { value: '2', text: 'Em diligência' },
-                    { value: '3', text: 'Em execução' },
-                    { value: '4', text: 'Concluído com pendência' },
-                    { value: '5', text: 'Concluído sem pendência' },
-                    { value: '6', text: 'Cancelado' },
-                ],
+				optionsStatusParecer: [
+						{ value: '1', text: 'Em análise' },
+						{ value: '2', text: 'Em diligência' },
+						{ value: '3', text: 'Em execução' },
+						{ value: '4', text: 'Concluído com pendência' },
+						{ value: '5', text: 'Concluído sem pendência' },
+						{ value: '6', text: 'Cancelado' },
+				],
+				cityOptions: [
+						{ value: '1', text: 'Juazeiro' },
+						{ value: '2', text: 'Remanso' },
+						{ value: '3', text: 'Uauá' },
+						{ value: '4', text: 'Paulo Afonso' },
+						{ value: '5', text: 'Senhor do Bonfim' },
+				],
+				actionsOptions: [
+						{ value: '1', text: 'MSD' },
+						{ value: '2', text: 'MH' },
+						{ value: '3', text: 'SAA' },
+						{ value: '4', text: 'SES' },
+						{ value: '5', text: 'DRE' },
+				],
+				project_data: {
+					title: '',
+					process_number: '',
+					agreement_number: '',
+					city: 1,
+					status: 1,
+					action: 1,
+					user: 1,
+					resume: '',
+				},
 				parecer: {
 					project_id: null,
 					status: 1,
@@ -198,19 +248,22 @@
 
 		mounted() {
 			this.listProjects();
+
+			this.getUsers();
 		},
 
 		methods: {
-            listProjects() {
-                this.axios
-				.get('/project')
-				.then(({data}) => {
-                    this.items = data;
-				});
-            },
-            showModalParecer(id) {
-                this.parecer.project_id = id;
-                this.$refs['modal-parecer'].show();
+			listProjects() {
+					this.axios
+						.get('/project')
+						.then(({data}) => {
+							this.items = data;
+						});
+			},
+					
+			showModalParecer(id) {
+				this.parecer.project_id = id;
+				this.$refs['modal-parecer'].show();
 			},
 
 			showRegisterModal() {
@@ -218,9 +271,9 @@
 			},
 
 			onFiltered(filteredItems) {
-        // Trigger pagination to update the number of buttons/pages due to filtering
-        this.totalRows = filteredItems.length
-        this.currentPage = 1
+				// Trigger pagination to update the number of buttons/pages due to filtering
+				this.totalRows = filteredItems.length
+				this.currentPage = 1
 			},
 
 			showDeleteDialog(project) {
@@ -234,50 +287,64 @@
 					centered: true,
 					okTitle: 'Sim',
 					cancelTitle: 'Não',
-          footerClass: 'p-2',
-          hideHeaderClose: false,
+					footerClass: 'p-2',
+					hideHeaderClose: false,
 				})
 					.then(value => {
 						 this.axios.delete(`/project/${project.id}`)
-                            .then(({data}) => {
-                                this.$bvToast.toast(`Convênio ${project.agreement_number} deletado`, {
-                                    title: 'Deletado',
-                                    autoHideDelay: 5000,
-                                    appendToast: append
-                                })
-                                this.listProjects();
-                            });
+								.then(({data}) => {
+										this.$bvToast.toast(`Convênio ${project.agreement_number} deletado`, {
+												title: 'Deletado',
+												autoHideDelay: 5000,
+												appendToast: append
+										})
+										this.listProjects();
+								});
 					})
 					.catch(err => {
 						this.$bvModal.msgBoxOk(`Sem permissão para deletar`, {
-                            title: 'Aviso',
-                            size: 'md',
-                            buttonSize: 'md',
-                            okVariant: 'primary',
-                            cancelVariant: 'danger',
-                            headerClass: 'p-4 border-bottom-0',
-                            centered: true,
-                            okTitle: 'Sim',
-                            cancelTitle: 'Não',
-                            footerClass: 'p-2',
-                            hideHeaderClose: false,
-                        });
-			        });
-            },
+								title: 'Aviso',
+								size: 'md',
+								buttonSize: 'md',
+								okVariant: 'primary',
+								cancelVariant: 'danger',
+								headerClass: 'p-4 border-bottom-0',
+								centered: true,
+								okTitle: 'Sim',
+								cancelTitle: 'Não',
+								footerClass: 'p-2',
+								hideHeaderClose: false,
+						});
+					});
+			},
 
-            criarParecer() {
-                console.log(this.parecer);
+			criarParecer() {
+					this.axios
+						.post(`/project/${this.parecer.project_id}/status`, {
+								'status': this.parecer.status,
+								'technical_opinion': this.parecer.technical_opinion,
+						})
+						.then(({data}) => {
+								this.$refs['modal-parecer'].hide();
+								this.listProjects();
+						});
+			},
 
-                this.axios
-                    .post(`/project/${this.parecer.project_id}/status`, {
-                        'status': this.parecer.status,
-                        'technical_opinion': this.parecer.technical_opinion,
-                    })
-                    .then(({data}) => {
-                        this.$refs['modal-parecer'].hide();
-                        this.listProjects();
-                    });
-            }
-    }
+			getUsers() {
+				this.axios
+				.get('/user')
+				.then(({data}) => {
+					this.users = data.map((user_data) => {
+						const { id: value, name: text, id: id} = user_data;
+						const filtered_data = {value, text, id};
+						return filtered_data;
+					});
+				});
+			},
+
+			createProject() {
+				//
+			}
+		}
 	}
 </script>
