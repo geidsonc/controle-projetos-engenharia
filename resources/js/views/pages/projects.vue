@@ -83,7 +83,7 @@
 						<b-icon-three-dots-vertical variant="secondary"></b-icon-three-dots-vertical>
 					</template>
 
-					<b-dropdown-item>Editar</b-dropdown-item>
+					<b-dropdown-item @click="showEditProject(row.item.id)">Editar</b-dropdown-item>
 					<b-dropdown-item @click="showDeleteDialog(row.item)">Excluir</b-dropdown-item>
 				</b-dropdown>
 			</template>
@@ -118,7 +118,8 @@
 			okTitle="Cadastrar"
 			cancel-title="Fechar"
             no-close-on-backdrop
-			@ok="createProject"
+            ok-title-html="Salvar"
+			@ok="createOrEditProject"
 		>
             <b-form>
 
@@ -261,6 +262,7 @@
 						{ value: 'DRE', text: 'DRE - Drenagem' },
 				],
 				project_data: {
+                    id: null,
 					name: '',
 					process_number: '',
 					agreement_number: '',
@@ -303,6 +305,7 @@
 
 			showRegisterModal() {
                 this.project_data = {
+                    id: null,
 					name: '',
 					process_number: '',
 					agreement_number: '',
@@ -317,6 +320,26 @@
 
 				this.$refs['register-modal'].show();
 			},
+
+            showEditProject(id) {
+                this.project_data.id = id;
+
+                this.axios.get(`project/${id}`)
+                    .then(({data}) => {
+                        this.project_data.name = data.name;
+                        this.project_data.process_number = data.process_number;
+                        this.project_data.agreement_number = data.agreement_number;
+                        this.project_data.start_date = data.start_date;
+                        this.project_data.end_date = data.end_date;
+                        this.project_data.city = data.city;
+                        this.project_data.status = data.project_status.reverse()[0].status;
+                        this.project_data.action = data.action;
+                        this.project_data.user = data.users[0].id;
+                        this.project_data.resume = (data.resume || '');
+                    });
+
+                this.$refs['register-modal'].show();
+            },
 
 			onFiltered(filteredItems) {
 				// Trigger pagination to update the number of buttons/pages due to filtering
@@ -386,7 +409,7 @@
 				});
 			},
 
-			createProject(ev) {
+			createOrEditProject(ev) {
                 ev.preventDefault();
 
                 if (!this.validaFieldsProject()) {
@@ -394,6 +417,14 @@
                     return;
                 }
 
+                if (this.project_data.id != null) {
+                    this.editProject();
+                } else {
+                    this.createProject();
+                }
+			},
+
+            createProject() {
                 this.axios
                     .post('/project', {
                         ...this.project_data,
@@ -412,7 +443,23 @@
                     .catch(({response}) => {
 						this.showMessageDialog('Aviso', response.data.message);
                     });
-			},
+            },
+
+            editProject() {
+                this.axios
+                    .put(`/project/${this.project_data.id}`, {
+                        ...this.project_data,
+                        users_ids: [this.project_data.user],
+                    })
+                    .then((data) => {
+                        this.showToast('Sucesso', `Projeto convênio nº ${this.project_data.agreement_number} atualizado com sucesso`);
+                        this.$refs['register-modal'].hide();
+                        this.listProjects();
+                    })
+                    .catch(({response}) => {
+						this.showMessageDialog('Aviso', response.data.message);
+                    });
+            },
 
             getUserAuthenticated() {
                 this.axios
