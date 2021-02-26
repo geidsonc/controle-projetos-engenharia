@@ -12,9 +12,6 @@
     <title>{{env('APP_NAME')}}</title>
 </head>
 <body>
-    <div class="text-right p-5">
-        <span class="font-weight-bold">Bem vindo, {{ auth()->user()->name }}</span> | <a href="/auth/logout">Sair</a>
-    </div>
     <div id="app">
         <app></app>
     </div>

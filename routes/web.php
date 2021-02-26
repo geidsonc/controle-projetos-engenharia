@@ -33,5 +33,9 @@ Route::apiResource('user', UserController::class)->only([
 Route::get('auth/login', 'App\Http\Controllers\AuthController@login');
 Route::get('auth/logout', 'App\Http\Controllers\AuthController@logout');
 
+Route::get('auth/user', function() {
+    return auth()->user();
+});
+
 
 // Route::get('/{any?}', App\Http\Controllers\PagesController::class);

@@ -4,10 +4,15 @@
 		class="py-3 px-5"
 	>
 				<b-row>
-						<b-col cols="11">
+						<b-col cols="8">
 								<h2>Lista de projetos</h2>
 								<h6>Emita pareceres e gerencie projetos acompanhados por você</h6>
 						</b-col>
+                        <b-col class="text-right" v-if="user.name">
+                            <span class="font-weight-bold">
+                                Bem vindo, {{ user.name }}
+                            </span> | <a href="/auth/logout">Sair</a>
+                        </b-col>
 				</b-row>
 
 		<div class="d-flex justify-content-between mt-5 align-items-center">
@@ -30,7 +35,7 @@
 				</b-input-group>
 			</b-form-group>
 
-			<b-button class="align-self-start" size="sm" variant="outline-primary" @click="showRegisterModal">
+			<b-button v-if="user.type == 'A'" class="align-self-start" size="sm" variant="outline-primary" @click="showRegisterModal">
 				Cadastrar projeto
 			</b-button>
 		</div>
@@ -112,38 +117,67 @@
 			title="Cadastrar projeto"
 			okTitle="Cadastrar"
 			cancel-title="Fechar"
+            no-close-on-backdrop
 			@ok="createProject"
 		>
-			<div class="mt-3">Title:</div>
-			<b-form-input class="mt-1" v-model="project_data.name" placeholder="Informe o título do projeto"></b-form-input>
+            <b-form>
 
-			<div class="mt-3">Nº do processo de Projeto:</div>
-			<b-form-input class="mt-1" v-model="project_data.process_number" placeholder="Informe o número do processo do projeto"></b-form-input>
-			
-			<div class="mt-3">Nº de convênio:</div>
-			<b-form-input class="mt-1" v-model="project_data.agreement_number" placeholder="Informe o número de convênio do projeto"></b-form-input>
+                <div class="mt-3"><span class="text-danger">*</span>Título:</div>
+                <b-form-input class="mt-1" v-model="project_data.name" placeholder="Informe o título do projeto"></b-form-input>
 
-			<div class="mt-3">Ação:</div>
-			<b-form-select v-model="project_data.action" :options="actionsOptions"></b-form-select>
-			
-			<div class="mt-3">Situação:</div>
-			<b-form-select v-model="project_data.status" :options="optionsStatusParecer"></b-form-select>
+                <div class="mt-3"><span class="text-danger">*</span>Nº do processo:</div>
+                <b-form-input class="mt-1" v-model="project_data.process_number" placeholder="Informe o número do processo do projeto"></b-form-input>
 
-			<div class="mt-3">Técnico responsável:</div>
-			<b-form-select v-model="project_data.user" :options="users"></b-form-select>
+                <div class="mt-3"><span class="text-danger">*</span>Nº de convênio:</div>
+                <b-form-input class="mt-1" v-model="project_data.agreement_number" placeholder="Informe o número de convênio do projeto"></b-form-input>
 
-			<div class="mt-3">Município:</div>
-			<b-form-select v-model="project_data.city" :options="cityOptions"></b-form-select>
+                <div class="mt-3"><span class="text-danger">*</span>Ação:</div>
+                <b-form-select v-model="project_data.action" :options="actionsOptions"></b-form-select>
 
-			<div class="mt-3">Observação:</div>
-			<b-form-textarea
-				id="textarea"
-				v-model="project_data.resume"
-				placeholder="Adicione alguma observação"
-				rows="3"
-				max-rows="6"
-				class="mb-4"
-			/>
+                <b-row>
+                    <b-col>
+                        <div class="mt-3"><span class="text-danger">*</span>Data de início</div>
+                        <b-form-datepicker
+                            v-model="project_data.start_date"
+                            class="mt-1"
+                            placeholder="Selecione uma data"
+                            :date-format-options="{ year: 'numeric', month: '2-digit'}"
+                            locale="pt-br"
+                        >
+                        </b-form-datepicker>
+                    </b-col>
+                    <b-col>
+                        <div class="mt-3"><span class="text-danger">*</span>Data de fim</div>
+                        <b-form-datepicker
+                            v-model="project_data.end_date"
+                            class="mt-1"
+                            placeholder="Selecione uma data"
+                            :date-format-options="{ year: 'numeric', month: '2-digit'}"
+                            locale="pt-br"
+                        >
+                        </b-form-datepicker>
+                    </b-col>
+                </b-row>
+
+                <div class="mt-3"><span class="text-danger">*</span>Situação:</div>
+                <b-form-select v-model="project_data.status" :options="optionsStatusParecer"></b-form-select>
+
+                <div class="mt-3"><span class="text-danger">*</span>Técnico responsável:</div>
+                <b-form-select v-model="project_data.user" :options="users"></b-form-select>
+
+                <div class="mt-3"><span class="text-danger">*</span>Localidade:</div>
+                <b-form-input class="mt-1" v-model="project_data.city" placeholder="Informe a localidade"></b-form-input>
+
+                <div class="mt-3">Resumo do projeto:</div>
+                <b-form-textarea
+                    id="textarea"
+                    v-model="project_data.resume"
+                    placeholder="Adicione informações relevantes sobre o projeto"
+                    rows="3"
+                    max-rows="6"
+                    class="mb-4"
+                />
+            </b-form>
 		</b-modal>
 
 	</b-container>
@@ -153,6 +187,10 @@
 	export default {
 		data() {
 			return {
+                user: {
+                    name: '',
+                    type: null,
+                },
 				users: [],
 				filter: null,
 				filterOn: [],
@@ -214,28 +252,24 @@
 						{ value: '5', text: 'Concluído sem pendência' },
 						{ value: '6', text: 'Cancelado' },
 				],
-				cityOptions: [
-						{ value: '1', text: 'Juazeiro' },
-						{ value: '2', text: 'Remanso' },
-						{ value: '3', text: 'Uauá' },
-						{ value: '4', text: 'Paulo Afonso' },
-						{ value: '5', text: 'Senhor do Bonfim' },
-				],
 				actionsOptions: [
-						{ value: '1', text: 'MSD' },
-						{ value: '2', text: 'MH' },
-						{ value: '3', text: 'SAA' },
-						{ value: '4', text: 'SES' },
-						{ value: '5', text: 'DRE' },
+						{ value: 'MSD', text: 'MSD - Melhorias sanitárias domiciliares' },
+						{ value: 'MH', text: 'MH - Melhoria habitacional' },
+						{ value: 'SAA', text: 'SAA - Sistema de abastecimento de água' },
+						{ value: 'SES', text: 'SES - Sistema de esgotamento sanitário' },
+						{ value: 'RES', text: 'RES - Resíduos' },
+						{ value: 'DRE', text: 'DRE - Drenagem' },
 				],
 				project_data: {
-					title: '',
+					name: '',
 					process_number: '',
 					agreement_number: '',
-					city: 1,
-					status: 1,
-					action: 1,
-					user: 1,
+                    start_date: null,
+                    end_date: null,
+					city: '',
+					status: null,
+					action: null,
+					user: null,
 					resume: '',
 				},
 				parecer: {
@@ -249,6 +283,7 @@
 		mounted() {
 			this.listProjects();
 
+            this.getUserAuthenticated();
 			this.getUsers();
 		},
 
@@ -260,13 +295,26 @@
 							this.items = data;
 						});
 			},
-					
+
 			showModalParecer(id) {
 				this.parecer.project_id = id;
 				this.$refs['modal-parecer'].show();
 			},
 
 			showRegisterModal() {
+                this.project_data = {
+					name: '',
+					process_number: '',
+					agreement_number: '',
+                    start_date: null,
+                    end_date: null,
+					city: '',
+					status: null,
+					action: null,
+					user: null,
+					resume: '',
+				};
+
 				this.$refs['register-modal'].show();
 			},
 
@@ -292,28 +340,23 @@
 				})
 					.then(value => {
 						 this.axios.delete(`/project/${project.id}`)
-								.then(({data}) => {
-										this.$bvToast.toast(`Convênio ${project.agreement_number} deletado`, {
-												title: 'Deletado',
-												autoHideDelay: 5000,
-												appendToast: append
-										})
-										this.listProjects();
-								});
+                            .then(({data}) => {
+                                    this.showToast('Deletado', `Convênio ${project.agreement_number} deletado`);
+                                    this.listProjects();
+                            });
 					})
 					.catch(err => {
 						this.$bvModal.msgBoxOk(`Sem permissão para deletar`, {
-								title: 'Aviso',
-								size: 'md',
-								buttonSize: 'md',
-								okVariant: 'primary',
-								cancelVariant: 'danger',
-								headerClass: 'p-4 border-bottom-0',
-								centered: true,
-								okTitle: 'Sim',
-								cancelTitle: 'Não',
-								footerClass: 'p-2',
-								hideHeaderClose: false,
+                            title: 'Aviso',
+                            size: 'md',
+                            buttonSize: 'md',
+                            okVariant: 'primary',
+                            cancelVariant: 'danger',
+                            headerClass: 'p-4 border-bottom-0',
+                            centered: true,
+                            okTitle: 'Sim',
+                            footerClass: 'p-2',
+                            hideHeaderClose: false,
 						});
 					});
 			},
@@ -325,6 +368,7 @@
 								'technical_opinion': this.parecer.technical_opinion,
 						})
 						.then(({data}) => {
+                                this.showToast('Sucesso', 'Parecer criado com sucesso');
 								this.$refs['modal-parecer'].hide();
 								this.listProjects();
 						});
@@ -342,9 +386,79 @@
 				});
 			},
 
-			createProject() {
-				//
-			}
+			createProject(ev) {
+                ev.preventDefault();
+
+                if (!this.validaFieldsProject()) {
+                    this.showMessageDialog('Aviso', 'Campos obrigatórios não preenchidos');
+                    return;
+                }
+
+                this.axios
+                    .post('/project', {
+                        ...this.project_data,
+                        users_ids: [this.project_data.user],
+                    })
+                    .then((data) => {
+                        this.showToast('Sucesso', 'Novo projeto cadastrado');
+                        this.$bvToast.toast(`Novo projeto cadastrado`, {
+                            title: 'Sucesso',
+                            autoHideDelay: 5000,
+                            appendToast: false
+                        })
+                        this.$refs['register-modal'].hide();
+                        this.listProjects();
+                    })
+                    .catch(({response}) => {
+						this.showMessageDialog('Aviso', response.data.message);
+                    });
+			},
+
+            getUserAuthenticated() {
+                this.axios
+                    .get('/auth/user')
+                    .then(({data}) => {
+                        this.user = data;
+                    });
+            },
+
+            validaFieldsProject() {
+                return !(
+                    this.project_data.name == '' ||
+                    this.project_data.process_number == '' ||
+                    this.project_data.agreement_number == '' ||
+                    this.project_data.start_date == null ||
+                    this.project_data.end_date == null ||
+                    this.project_data.city == '' ||
+                    this.project_data.status == null ||
+                    this.project_data.action == null ||
+                    this.project_data.user == null
+                );
+            },
+
+            showMessageDialog(title, message) {
+                this.$bvModal.msgBoxOk(message, {
+								title: title,
+								size: 'md',
+								buttonSize: 'md',
+								okVariant: 'primary',
+								cancelVariant: 'danger',
+								headerClass: 'border-bottom-0',
+								centered: true,
+								okTitle: 'Fechar',
+								hideHeaderClose: false,
+						});
+            },
+
+            showToast(title, message) {
+                this.$bvToast.toast(message, {
+                    title: title,
+                    autoHideDelay: 5000,
+                    appendToast: false,
+                    toaster: 'b-toaster-bottom-left',
+                    variant: 'success'
+                });
+            }
 		}
 	}
 </script>

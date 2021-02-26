@@ -22,7 +22,7 @@ class CreateProjectTable extends Migration
             $table->date('start_date');
             $table->date('end_date');
             $table->string('city', 50);
-            $table->text('resume');
+            $table->text('resume')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

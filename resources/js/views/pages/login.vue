@@ -59,6 +59,7 @@
 	}
 
 	.card-style {
-		max-width: 20rem;
+        width: 350px;
+		max-width: 350px;
 	}
 </style>

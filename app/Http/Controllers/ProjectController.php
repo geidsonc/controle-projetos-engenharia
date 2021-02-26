@@ -50,12 +50,17 @@ class ProjectController extends Controller
             'action' => 'required|in:MSD,MH,SAA,SES,RES,DRE',
             'start_date' => 'required|date|date_format:Y-m-d',
             'end_date' => 'required|date|date_format:Y-m-d',
-            'city',
-            'resume',
+            'city' => 'required',
             'users_ids' => 'array',
         ]);
 
         $project = Project::create($request->except(['users_ids']));
+        $project->projectStatus()->create([
+            'user_id' => auth()->id(),
+            'technical_opinion' => 'Projeto criado',
+            'status' => $request->status,
+        ]);
+
         $this->insertResponsibles($project, $request->users_ids);
 
         return true;
