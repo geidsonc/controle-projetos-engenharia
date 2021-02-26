@@ -6,8 +6,8 @@
 			title="Login"
 			class="mb-2 card-style"
 		>
-			<div class="mt-4">CPF:</div>
-			<b-form-input class="mt-1" v-model="cpf" placeholder="Informe seu CPF"></b-form-input>
+			<div class="mt-4">Email:</div>
+			<b-form-input class="mt-1" v-model="cpf" placeholder="Informe seu email"></b-form-input>
 
 			<div class="mt-3">Senha:</div>
 			<b-form-input class="mt-1" type="password" v-model="password" placeholder="Informe sua senha"></b-form-input>
