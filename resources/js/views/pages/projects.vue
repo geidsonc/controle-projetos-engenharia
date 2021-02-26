@@ -77,7 +77,7 @@
 				</b-button>
 			</template>
 
-			 <template #cell(more_actions)="row">
+			 <template #cell(more_actions)="row" v-if="user.type == 'A'">
 				<b-dropdown size="md"  variant="link" toggle-class="text-decoration-none" no-caret>
 					<template #button-content>
 						<b-icon-three-dots-vertical variant="secondary"></b-icon-three-dots-vertical>
@@ -299,7 +299,12 @@
 			},
 
 			showModalParecer(id) {
-				this.parecer.project_id = id;
+                this.parecer = {
+                    project_id: id,
+					status: null,
+					technical_opinion: ''
+                };
+
 				this.$refs['modal-parecer'].show();
 			},
 
