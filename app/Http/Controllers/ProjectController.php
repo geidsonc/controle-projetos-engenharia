@@ -56,9 +56,14 @@ class ProjectController extends Controller
         ]);
 
         $project = Project::create($request->except(['users_ids']));
-        $project->users()->sync($request->users_ids);
+        $this->insertResponsibles($project, $request->users_ids);
 
         return true;
+    }
+
+    private function insertResponsibles($project, $users_ids)
+    {
+        $project->users()->sync($users_ids);
     }
 
     /**
