@@ -441,11 +441,6 @@
                     })
                     .then((data) => {
                         this.showToast('Sucesso', 'Novo projeto cadastrado');
-                        this.$bvToast.toast(`Novo projeto cadastrado`, {
-                            title: 'Sucesso',
-                            autoHideDelay: 5000,
-                            appendToast: false
-                        })
                         this.$refs['register-modal'].hide();
                         this.listProjects();
                     })
