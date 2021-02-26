@@ -8,9 +8,6 @@
                 <h2>Lista de projetos</h2>
                 <h6>Emita pareceres e gerencie projetos acompanhados por você</h6>
             </b-col>
-            <b-col class="text-right">
-                <a href="/auth/logout">Sair</a>
-            </b-col>
         </b-row>
 
 		<div class="d-flex justify-content-between mt-5 align-items-center">
@@ -46,6 +43,7 @@
 			:filter="filter"
       :filter-included-fields="filterOn"
 			@filtered="onFiltered"
+            style="font-size: 15px !important"
 		>
             <template #cell(name)="row">
 				{{row.item.name}}
@@ -151,6 +149,16 @@
 					{
 						key: 'user_name',
 						label: 'Técnico',
+						sortable: true
+					},
+					{
+						key: 'start_date',
+						label: 'Início',
+						sortable: true
+					},
+					{
+						key: 'end_date',
+						label: 'Fim',
 						sortable: true
 					},
 					{
