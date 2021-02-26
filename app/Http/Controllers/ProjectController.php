@@ -20,7 +20,7 @@ class ProjectController extends Controller
             return auth()->user->projects;
         }
 
-        return ProjectResource::collection(Project::all());
+        return ProjectResource::collection(Project::with(['users', 'projectStatus'])->get()->all());
     }
 
     /**

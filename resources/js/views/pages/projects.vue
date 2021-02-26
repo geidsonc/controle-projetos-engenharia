@@ -40,8 +40,21 @@
 			@filtered="onFiltered"
 		>
 
+            <template #cell(user_name)="row">
+                <div
+                    v-for="user in row.item.users"
+                    :key="user.id"
+                >
+				    {{user.name}}
+                </div>
+			</template>
+
+            <template #cell(action)="row">
+				{{row.item.action}} - {{ row.item.action_value }}
+			</template>
+
 			<template #cell(status)="row">
-				<b-badge pill variant="info">{{row.item.status}}</b-badge>
+				<b-badge pill variant="info">{{row.item.project_status[0].status_value}}</b-badge>
 			</template>
 
 			 <template #cell(button)="row">
@@ -105,6 +118,11 @@
 				fields: [
 					{
 						key: 'process_number',
+						label: 'Nº do processo',
+						sortable: true
+					},
+                    {
+						key: 'agreement_number',
 						label: 'Nº de convênio',
 						sortable: true
 					},
@@ -131,10 +149,6 @@
 					{ key: 'more_actions', label: '' }
 				],
 				items: [
-					{ process_number: 1212123, user_name: 'João', city: 'Petrolina', action: 'MSS', status: 'Em análise' },
-					{ process_number: 2134345, user_name: 'Chico', city: 'Petrolina', action: 'MSS', status: 'Em análise' },
-					{ process_number: 8933122, user_name: 'Geraldo', city: 'Juazeiro', action: 'MSS', status: 'Em análise' },
-					{ process_number: 3359768, user_name: 'Pedro', city: 'Juazeiro', action: 'MSS', status: 'Em análise' }
 				]
 			}
 		},
@@ -142,10 +156,8 @@
 		mounted() {
 			this.axios
 				.get('/project')
-				.then(({data}) => {	
-					if (!!data) {
-						this.$router.push({name:'projects'});
-					}
+				.then(({data}) => {
+                    this.items = data;
 				});
 		},
 
