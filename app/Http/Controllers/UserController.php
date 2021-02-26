@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
+use App\Models\User;
 use Illuminate\Http\Request;
 
-class PagesController extends Controller
+class UserController extends Controller
 {
     /**
      * Handle the incoming request.
@@ -12,8 +14,8 @@ class PagesController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function __invoke()
+    public function index()
     {
-        return view('welcome');
+        return UserResource::collection(User::all());
     }
 }

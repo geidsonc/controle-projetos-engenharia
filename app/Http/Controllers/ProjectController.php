@@ -15,12 +15,13 @@ class ProjectController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
+    {   $projects_query = Project::query();
+
         if (auth()->user()->type != User::TYPE_GERENTE) {
-            return auth()->user->projects;
+            $projects_query = auth()->user()->projects();
         }
 
-        $projects = Project::with([
+        $projects = $projects_query->with([
             'users',
             'projectStatus' => function($query) {
                 $query->latest();
