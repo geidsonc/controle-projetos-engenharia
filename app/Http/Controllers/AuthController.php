@@ -28,7 +28,8 @@ class AuthController extends Controller
 
     public function logout()
     {
-        return Auth::logout();
+        Auth::logout();
+        return redirect('/');
     }
 
     private function autenticar($email, $password)

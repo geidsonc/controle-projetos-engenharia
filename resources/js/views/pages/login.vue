@@ -41,7 +41,8 @@
 				.get('/auth/login', {params: {email: this.cpf, password: this.password}})
 				.then(({data}) => {
 					if (!!data) {
-						this.$router.push({name:'projects'});
+                        location.href = '/';
+						// this.$router.push({name:'projects'});
 						this.isAuthenticated = true;
 					}
 				}).catch((error) => {

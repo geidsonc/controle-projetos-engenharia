@@ -16,7 +16,7 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        if (auth()->user->type != User::TYPE_GERENTE) {
+        if (auth()->user()->type != User::TYPE_GERENTE) {
             return auth()->user->projects;
         }
 
@@ -31,7 +31,7 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
-        if (auth()->user->type != User::TYPE_GERENTE) {
+        if (auth()->user()->type != User::TYPE_GERENTE) {
             return abort(401, 'Não autorizado');
         }
 
@@ -79,7 +79,7 @@ class ProjectController extends Controller
      */
     public function update(Request $request, Project $project)
     {
-        if (auth()->user->type != User::TYPE_GERENTE) {
+        if (auth()->user()->type != User::TYPE_GERENTE) {
             return abort(401, 'Não autorizado');
         }
 
@@ -109,7 +109,7 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        if (auth()->user->type != User::TYPE_GERENTE) {
+        if (auth()->user()->type != User::TYPE_GERENTE) {
             return abort(401, 'Não autorizado');
         }
 

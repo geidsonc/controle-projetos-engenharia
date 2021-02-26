@@ -1,15 +1,10 @@
-import Login from './views/pages/login.vue';
-import Projects from './views/pages/Projects.vue';
+import Projects from './views/pages/projects.vue';
 
 export default [
     {
 		path: '/',
-		redirect: '/login',
+		redirect: '/projects',
 	},
-	{
-		path: '/login',
-		component: Login,
-    },
     {
         path: '/projects',
         name: 'projects',

@@ -15,9 +15,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'App\Http\Controllers\HomeController@show');
 
 Route::apiResource('project', ProjectController::class)
     ->middleware('auth');
@@ -30,5 +28,5 @@ Route::apiResource('project.status', ProjectStatusController::class)->only([
 Route::get('auth/login', 'App\Http\Controllers\AuthController@login');
 Route::get('auth/logout', 'App\Http\Controllers\AuthController@logout');
 
-    
+
 // Route::get('/{any?}', App\Http\Controllers\PagesController::class);
