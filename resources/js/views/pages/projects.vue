@@ -353,7 +353,7 @@
 			},
 
 			showDeleteDialog(project) {
-				this.$bvModal.msgBoxOk(`Realmente deseja excluir o convênio ${project.agreement_number}? A ação não poderá ser desfeita.`, {
+				this.$bvModal.msgBoxConfirm(`Realmente deseja excluir o convênio ${project.agreement_number}? A ação não poderá ser desfeita.`, {
 					title: 'Confirmação de exclusão',
 					size: 'md',
 					buttonSize: 'md',
@@ -365,28 +365,32 @@
 					cancelTitle: 'Não',
 					footerClass: 'p-2',
 					hideHeaderClose: false,
+                    noCloseOnBackdrop: true,
 				})
 					.then(value => {
-						 this.axios.delete(`/project/${project.id}`)
+                        if (!value) {
+                            return;
+                        }
+
+						this.axios.delete(`/project/${project.id}`)
                             .then(({data}) => {
                                     this.showToast('Deletado', `Convênio ${project.agreement_number} deletado`);
                                     this.listProjects();
+                            }).catch(err => {
+                                this.$bvModal.msgBoxOk(`Sem permissão para deletar`, {
+                                    title: 'Aviso',
+                                    size: 'md',
+                                    buttonSize: 'md',
+                                    okVariant: 'primary',
+                                    cancelVariant: 'danger',
+                                    headerClass: 'p-4 border-bottom-0',
+                                    centered: true,
+                                    okTitle: 'Sim',
+                                    footerClass: 'p-2',
+                                    hideHeaderClose: false,
+                                });
                             });
-					})
-					.catch(err => {
-						this.$bvModal.msgBoxOk(`Sem permissão para deletar`, {
-                            title: 'Aviso',
-                            size: 'md',
-                            buttonSize: 'md',
-                            okVariant: 'primary',
-                            cancelVariant: 'danger',
-                            headerClass: 'p-4 border-bottom-0',
-                            centered: true,
-                            okTitle: 'Sim',
-                            footerClass: 'p-2',
-                            hideHeaderClose: false,
-						});
-					});
+					    });
 			},
 
 			criarParecer() {
